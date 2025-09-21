@@ -8,4 +8,5 @@ public class Demo {
         int palpite = new Scanner(System.in).nextInt();
         System.out.println(palpite == numero ? "🎉 Acertou!" : "❌ Errou! O número era " + numero);
     }
+
 }
