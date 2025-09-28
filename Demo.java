@@ -6,28 +6,24 @@ import br.ufersa.quizods4.modelo.Quiz;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
 public class Demo {
 
     public static void main(String[] args) {
         new Demo().iniciarAplicacao();
     }
 
-    // Simulação de Dados (RF1: O método real seria na classe Dados)
+    // Simulação de Dados (RF1: O método real leria um arquivo JSON/CSV)
     public static List<Questao> criarDadosIniciais() {
         List<Questao> questoes = new ArrayList<>();
         
-        // Categoria: Matemática (Meta 4.6)
-        questoes.add(new Questao("Quanto é 5 x 7?", List.of("30", "35", "40", "45"), "2", "Matematica"));
-        
-        // Categoria: Português (Meta 4.6)
-        questoes.add(new Questao("Qual palavra está escrita corretamente?", List.of("Exceto", "Ecsceção", "Eçeção", "Exceção"), "4", "Português"));
-            
-        // Categoria: Cidadania/Sustentabilidade (Meta 4.7)
-        questoes.add(new Questao("Qual ODS trata da Educação de Qualidade?", List.of("ODS 1", "ODS 4", "ODS 10", "ODS 16"), "2", "Cidadania"));
+        // Dados para teste de categoria e pontuação
+        questoes.add(new Questao("Quanto é 5 x 7?", List.of("30", "35", "40", "45"), "2", "Matematica")); // Correta: 2
+        questoes.add(new Questao("Qual palavra está escrita corretamente?", List.of("Exceto", "Ecsceção", "Eçeção", "Exceção"), "4", "Português")); // Correta: 4
+        questoes.add(new Questao("Qual ODS trata da Educação de Qualidade?", List.of("ODS 1", "ODS 4", "ODS 10", "ODS 16"), "2", "Cidadania")); // Correta: 2
 
-        // Mais para teste de seleção
-        questoes.add(new Questao("Quanto é 2 + 2?", List.of("3", "4", "5"), "2", "Matematica"));
-        questoes.add(new Questao("Qual a capital do Brasil?", List.of("Rio", "Brasília", "São Paulo"), "2", "Cidadania"));
+        // Questão extra para categoria Matemática (será usada na demo)
+        questoes.add(new Questao("Quanto é 2 + 2?", List.of("3", "4", "5", "6"), "2", "Matematica"));
         
         return questoes;
     }
@@ -37,12 +33,12 @@ public class Demo {
         Quiz quiz = new Quiz(criarDadosIniciais()); // RF1 simulado
 
         System.out.println("=========================================");
-        System.out.println("  BEM-VINDO ao O DESAFIO DO SABER (ODS 4)");
+        System.out.println("  DEMO: O DESAFIO DO SABER (ODS 4)");
         System.out.println("=========================================");
 
         // RF2: Seleção de Categoria
         System.out.println("\nEscolha a categoria (digite o nome):");
-        System.out.println("- Matemática");
+        System.out.println("- Matematica");
         System.out.println("- Português");
         System.out.println("- Cidadania");
         System.out.print("> ");
@@ -56,7 +52,7 @@ public class Demo {
             return;
         }
 
-        System.out.println("\n--- Quiz de " + categoriaEscolhida + " Iniciado! ---");
+        System.out.println("\n--- Quiz de " + categoriaEscolhida + " Iniciado! (" + quiz.getTotalQuestoes() + " Questões) ---");
 
         // Loop principal do Quiz
         while (!quiz.isFimDoQuiz()) {
@@ -65,20 +61,23 @@ public class Demo {
 
             System.out.print("Sua resposta (digite o número da opção): ");
             
-            // Tratamento simples para garantir entrada inteira
+            int respostaUsuario = 0;
+            // Garantir que a entrada seja um número
             if (scanner.hasNextInt()) {
-                int respostaUsuario = scanner.nextInt();
-                boolean acertou = quiz.verificarResposta(respostaUsuario); // RF4 & RF5
-
-                if (acertou) {
-                    System.out.println("Parabéns! Resposta Correta.");
-                } else {
-                    System.out.println("Ops! Resposta Incorreta.");
-                }
+                respostaUsuario = scanner.nextInt();
             } else {
-                System.out.println("Entrada inválida. Tentando a próxima questão.");
-                quiz.verificarResposta(0); // Conta como erro
+                System.out.println("Entrada inválida. Tente novamente.");
                 scanner.next(); // Consome a linha inválida
+                continue; // Volta para o início do loop sem processar a resposta
+            }
+            scanner.nextLine(); // Consome a quebra de linha
+
+            boolean acertou = quiz.verificarResposta(respostaUsuario); // RF4 & RF5
+
+            if (acertou) {
+                System.out.println("-> Parabéns! Resposta Correta.");
+            } else {
+                System.out.println("-> Ops! Resposta Incorreta.");
             }
         }
         
@@ -92,5 +91,4 @@ public class Demo {
 
         scanner.close();
     }
-  
 }
