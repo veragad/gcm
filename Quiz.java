@@ -1,72 +1,78 @@
-package br.ufersa.quizods4.modelo;
-
+package projetogcm;
 import java.util.List;
 import java.util.ArrayList;
-
 public class Quiz {
-    private List<Questao> todasQuestoes;
+	private List<Questao> todasQuestoes;
     private List<Questao> questoesSelecionadas;
-    private int pontuacao;
-    private int totalRespondidas;
+    private Jogador jogador; 
+    private int indiceQuestaoAtual;
 
-    public Quiz(List<Questao> todasQuestoes) {
+    public Quiz(List<Questao> todasQuestoes, Jogador jogador) { 
         this.todasQuestoes = todasQuestoes;
-        this.pontuacao = 0;
-        this.totalRespondidas = 0;
+        this.jogador = jogador;
+        this.indiceQuestaoAtual = 0;
+        this.questoesSelecionadas = new ArrayList<>(); // Inicializa para evitar NullPointer
     }
 
-    // RF2: Seleciona e carrega as quest√µes para a categoria escolhida
+    // Seleciona e carrega as questıes
     public void selecionarCategoria(String categoria) {
-        questoesSelecionadas = new ArrayList<>();
+        questoesSelecionadas.clear(); 
         for (Questao q : todasQuestoes) {
-            // Compara√ß√£o ignorando case para flexibilidade
             if (q.getCategoria().equalsIgnoreCase(categoria)) {
                 questoesSelecionadas.add(q);
             }
         }
-        // Limita o quiz a 3 perguntas para a demo
-        questoesSelecionadas = questoesSelecionadas.subList(0, Math.min(3, questoesSelecionadas.size()));
+        // Limita o quiz: Se houver mais de 3, usa apenas as 3 primeiras.
+        int limite = Math.min(3, questoesSelecionadas.size());
+        if (limite < questoesSelecionadas.size()) {
+             questoesSelecionadas = questoesSelecionadas.subList(0, limite);
+        }
     }
 
-    // RF4 & RF5: Verifica a resposta e atualiza a pontua√ß√£o
+    // Verifica a resposta
     public boolean verificarResposta(int indiceRespostaUsuario) {
-        if (indiceRespostaUsuario < 1 || indiceRespostaUsuario > 4) {
-             // Simplesmente retorna falso para entrada inv√°lida
-             return false;
+        // ProteÁ„o 1: Checa se a lista de questıes est· vazia ou se j· terminamos.
+        if (questoesSelecionadas == null || indiceQuestaoAtual >= questoesSelecionadas.size()) {
+            return false;
         }
 
-        Questao q = questoesSelecionadas.get(totalRespondidas);
+        Questao q = questoesSelecionadas.get(indiceQuestaoAtual);
         
-        // A resposta correta deve ser o n√∫mero da op√ß√£o (ex: "1", "2")
-        boolean acertou = String.valueOf(indiceRespostaUsuario).equals(q.getRespostaCorreta());
-
-        if (acertou) {
-            pontuacao++;
+        // Se a quest„o 'q' fosse nula aqui, daria erro. 
+        // Mas a checagem acima deve evitar isso.
+        
+        // Verifica se a resposta est· dentro do range 1 a 4
+        boolean respostaValida = (indiceRespostaUsuario >= 1 && indiceRespostaUsuario <= 4);
+        
+        boolean acertou = false;
+        if (respostaValida) {
+            // Linha com problema de execuÁ„o (AQUI!)
+            acertou = String.valueOf(indiceRespostaUsuario).equals(q.getRespostaCorreta());
         }
-        totalRespondidas++;
+
+        jogador.registrarResposta(acertou && respostaValida);
         
-        return acertou;
+        indiceQuestaoAtual++; 
+        
+        return acertou && respostaValida;
     }
 
-    // RF6: C√°lculo final
-    public double calcularTaxaAcerto() {
-        if (totalRespondidas == 0) return 0.0;
-        return ((double) pontuacao / totalRespondidas) * 100;
-    }
-
-    // Getters auxiliares para o AppPrincipal
+    // Getters auxiliares
     public Questao getQuestaoAtual() {
-        if (totalRespondidas < questoesSelecionadas.size()) {
-            return questoesSelecionadas.get(totalRespondidas);
+        if (questoesSelecionadas != null && indiceQuestaoAtual < questoesSelecionadas.size()) {
+            return questoesSelecionadas.get(indiceQuestaoAtual);
         }
         return null; 
     }
     
     public boolean isFimDoQuiz() {
-        return totalRespondidas >= questoesSelecionadas.size();
+        if (questoesSelecionadas == null) return true;
+        return indiceQuestaoAtual >= questoesSelecionadas.size();
     }
     
-    // M√©todos para o Relat√≥rio Final (RF6)
-    public int getPontuacao() { return pontuacao; }
-    public int getTotalQuestoes() { return questoesSelecionadas.size(); }
+    public int getTotalQuestoes() { 
+        if (questoesSelecionadas == null) return 0;
+        return questoesSelecionadas.size(); 
+    }
+    
 }
