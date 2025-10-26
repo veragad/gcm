@@ -1,40 +1,26 @@
-package br.ufersa.quizods4.modelo;
+package projetogcm;
 
 public class Jogador {
-    private String nome;
+//Representa o jogador atual, contendo seu estado (pontuaÁ„o e total respondidas).
+	private String nome;
     private int pontuacao;
-    private double taxaAcerto;
+    private int totalRespondidas;
 
-    // Construtor
     public Jogador(String nome) {
         this.nome = nome;
         this.pontuacao = 0;
-        this.taxaAcerto = 0.0;
+        this.totalRespondidas = 0;
     }
 
-    // Atualiza dados ap√≥s o t√©rmino do quiz
-    public void atualizarDesempenho(int pontuacao, double taxaAcerto) {
-        this.pontuacao = pontuacao;
-        this.taxaAcerto = taxaAcerto;
-    }
-
-    // Exibe o resumo do jogador (RF6 - Relat√≥rio final)
-    public void imprimirResumo() {
-        System.out.println("\n===== RELAT√ìRIO FINAL =====");
-        System.out.println("Jogador: " + nome);
-        System.out.println("Pontua√ß√£o final: " + pontuacao);
-        System.out.printf("Taxa de acerto: %.2f%%\n", taxaAcerto);
-        if (taxaAcerto >= 70) {
-            System.out.println("Desempenho: Excelente! üéØ");
-        } else if (taxaAcerto >= 50) {
-            System.out.println("Desempenho: Bom! üëç Continue praticando!");
-        } else {
-            System.out.println("Desempenho: Precisa melhorar. üí™");
+    // MÈtodo para atualizar o estado do jogador (chamado por Quiz)
+    public void registrarResposta(boolean acertou) {
+        if (acertou) {
+            this.pontuacao++;
         }
-        System.out.println("=============================\n");
+        this.totalRespondidas++;
     }
 
-    // Getters e Setters
+    // Getters para RelatÛrio Final (RF6)
     public String getNome() {
         return nome;
     }
@@ -43,8 +29,14 @@ public class Jogador {
         return pontuacao;
     }
 
-    public double getTaxaAcerto() {
-        return taxaAcerto;
+    public int getTotalRespondidas() {
+        return totalRespondidas;
     }
-}
 
+    // RF6: C·lculo da Taxa de Acerto (agora no Jogador, com seus dados)
+    public double calcularTaxaAcerto() {
+        if (totalRespondidas == 0) return 0.0;
+        return ((double) pontuacao / totalRespondidas) * 100;
+    }	
+	    
+}

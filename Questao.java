@@ -1,14 +1,12 @@
-package br.ufersa.quizods4.modelo;
-
+package projetogcm;
 import java.util.List;
 
 public class Questao {
-    private String texto;
+	private String texto;
     private List<String> opcoes;
-    private String respostaCorreta;
+    private String respostaCorreta; // String ("1" a "4")
     private String categoria;
 
-    // Construtor
     public Questao(String texto, List<String> opcoes, String respostaCorreta, String categoria) {
         this.texto = texto;
         this.opcoes = opcoes;
@@ -16,21 +14,31 @@ public class Questao {
         this.categoria = categoria;
     }
 
-    // Método para exibir a questão no console
-    public void imprimirQuestao() {
-        System.out.println("\n== Categoria: " + categoria + " ==");
-        System.out.println("Pergunta: " + texto);
-        for (int i = 0; i < opcoes.size(); i++) {
-            System.out.println((i + 1) + ". " + opcoes.get(i));
-        }
+    public String getTexto() {
+        return texto;
     }
 
-    // Getters para a lógica de verificação
-    public String getRespostaCorreta() {
-        return respostaCorreta;
+    public List<String> getOpcoes() {
+        return opcoes;
     }
 
     public String getCategoria() {
         return categoria;
+    }
+    
+    public String getRespostaCorreta() {
+        return respostaCorreta;
+    }
+    // Adicionado para suportar o feedback visual na View
+    public int getRespostaCorretaIndice() {
+        try {
+            return Integer.parseInt(this.respostaCorreta);
+        } catch (NumberFormatException e) {
+            return -1; // Retorna um valor inv�lido em caso de erro
+        }
+    }
+
+    public boolean isRespostaCorreta(int respostaUsuario) {
+        return respostaUsuario == getRespostaCorretaIndice();
     }
 }
