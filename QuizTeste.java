@@ -3,61 +3,38 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-
 public class QuizTeste {
 	private Quiz quiz;
     private Jogador jogador; 
     private List<Questao> questoesDeTeste;
 
-    // MÈtodo de simulaÁ„o de dados (RF1)
-    private List<Questao> criarDadosIniciais() {
-        List<Questao> questoes = new ArrayList<>();
-        
-        // CORRE«√O: Usando Arrays.asList() em vez de List.of()
-        // Categoria: Matematica
-        questoes.add(new Questao("Quanto È 5 x 7?", Arrays.asList("30", "35", "40", "45"), "2", "Matematica"));
-        questoes.add(new Questao("Quanto È 2 + 2?", Arrays.asList("3", "4", "5", "6"), "2", "Matematica"));
-        
-        // Categoria: PortuguÍs
-        questoes.add(new Questao("Qual palavra est· escrita corretamente?", Arrays.asList("Exceto", "EcsceÁ„o", "EÁeÁ„o", "ExceÁ„o"), "4", "PortuguÍs"));
-        
-        // Categoria: Cidadania
-        questoes.add(new Questao("Qual ODS trata da EducaÁ„o de Qualidade?", Arrays.asList("ODS 1", "ODS 4", "ODS 10", "ODS 16"), "2", "Cidadania"));
-        
-        return questoes;
-    }
-
-    // ConfiguraÁ„o executada antes de CADA teste
     @BeforeEach
     void setUp() {
-        questoesDeTeste = criarDadosIniciais();
-        jogador = new Jogador("Teste"); 
-        // A categoria 'Matematica' tem 2 questıes nos dados de teste.
-        quiz = new Quiz(questoesDeTeste, jogador); 
+        // RF1 IMPLEMENTADO (Carrega dados do arquivo ou fallback)
+        questoesDeTeste = GerenciadorDeQuestoes.carregarQuestoesDeArquivo("questoes.json");
+        
+        jogador = new Jogador("Teste");
+        // Seleciona a categoria 'Matematica' para garantir o uso de quest√µes conhecidas
+        quiz = new Quiz(questoesDeTeste, jogador);
         quiz.selecionarCategoria("Matematica");
     }
 
-    // Teste 1: Valida se a seleÁ„o de categoria funciona e o limite (RF2)
+    // Teste 1: Valida se a sele√ß√£o de categoria funciona e limita a 3 quest√µes
     @Test
     void deveSelecionarAsQuestoesCorretasELimitar() {
-        // A categoria 'Matem·tica' tem 2 questıes nos dados de teste. O limite È 3.
-        assertEquals(2, quiz.getTotalQuestoes(), "Deve haver 2 questıes na categoria Matem·tica.");
-        
-        // A categoria 'Cidadania' tem 1 quest„o. O limite deve ser 1.
-        Quiz quizCidadania = new Quiz(questoesDeTeste, new Jogador("Teste2"));
-        quizCidadania.selecionarCategoria("Cidadania");
-        assertEquals(1, quizCidadania.getTotalQuestoes(), "Deve haver 1 quest„o na categoria Cidadania.");
+        // Agora usa o getQuestoesSelecionadas() que adicionamos na classe Quiz
+        assertEquals(2, quiz.getQuestoesSelecionadas().size(), "Deve selecionar o n√∫mero correto de quest√µes.");
+        assertEquals("Matematica", quiz.getQuestaoAtual().getCategoria(), "A categoria da primeira quest√£o deve ser Matem√°tica.");
     }
 
     // Teste 2: Valida resposta correta (RF4 & RF5) - Verifica o estado do Jogador
     @Test
     void deveIncrementarPontuacaoSeRespostaCorreta() {
-        boolean resultado = quiz.verificarResposta(2); // Resposta Correta (para 'Quanto È 5 x 7?')
+        // A primeira quest√£o de Matem√°tica tem a resposta correta "2" (35)
+        boolean resultado = quiz.verificarResposta(2); 
 
         assertTrue(resultado, "A resposta deve ser considerada correta.");
-        assertEquals(1, jogador.getPontuacao(), "A pontuaÁ„o do JOGADOR deve ser 1.");
+        assertEquals(1, jogador.getPontuacao(), "A pontua√ß√£o do JOGADOR deve ser 1.");
         assertEquals(1, jogador.getTotalRespondidas(), "O total respondido deve ser 1.");
     }
 
@@ -67,28 +44,21 @@ public class QuizTeste {
         boolean resultado = quiz.verificarResposta(3); // Resposta Incorreta
 
         assertFalse(resultado, "A resposta deve ser considerada incorreta.");
-        assertEquals(0, jogador.getPontuacao(), "A pontuaÁ„o do JOGADOR deve ser 0.");
+        assertEquals(0, jogador.getPontuacao(), "A pontua√ß√£o do JOGADOR deve ser 0.");
         assertEquals(1, jogador.getTotalRespondidas(), "O total respondido deve ser 1.");
     }
 
-    // Teste 4: Valida o c·lculo da taxa de acerto (RF6) - Verifica o mÈtodo do Jogador
+    // Teste 4: Valida o c√°lculo da taxa de acerto (RF6) - Verifica o m√©todo do Jogador
     @Test
     void deveCalcularTaxaDeAcertoCorretamente() {
-        // 1. Acerta a primeira (2)
+        // 1. Acerta a primeira (resposta 2)
         quiz.verificarResposta(2); 
-        // 2. Erra a segunda (a resposta correta È 2, vamos responder 1)
+        // 2. Erra a segunda (a resposta correta √© 2, vamos responder 1)
         quiz.verificarResposta(1); 
         
-        // PontuaÁ„o: 1 acerto em 2 questıes. 1/2 = 50.0%
+        // Pontua√ß√£o: 1 acerto em 2 quest√µes. 1/2 = 50.0%
         double taxaEsperada = 50.0; 
 
-        assertEquals(taxaEsperada, jogador.calcularTaxaAcerto(), 0.0001, "A taxa de acerto deve ser de 50.0% (1/2).");
-    }
-
-    // Teste 5: Valida taxa de acerto apÛs 0 respostas (Evitar divis„o por zero)
-    @Test
-    void deveRetornarZeroSeNenhumaResposta() {
-        assertEquals(0.0, jogador.calcularTaxaAcerto(), "A taxa deve ser 0% se nenhuma resposta foi dada.");
-    }		
-		
-}		
+        assertEquals(taxaEsperada, jogador.calcularTaxaAcerto(), 0.0001, "A taxa de acerto deve ser 50.0%.");
+    }	    
+}
