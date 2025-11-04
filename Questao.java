@@ -1,8 +1,8 @@
 package projetogcm;
 import java.util.List;
-
 public class Questao {
-	private String texto;
+
+    private String texto;
     private List<String> opcoes;
     private String respostaCorreta; // String ("1" a "4")
     private String categoria;
@@ -29,16 +29,17 @@ public class Questao {
     public String getRespostaCorreta() {
         return respostaCorreta;
     }
-    // Adicionado para suportar o feedback visual na View
+    
     public int getRespostaCorretaIndice() {
         try {
             return Integer.parseInt(this.respostaCorreta);
         } catch (NumberFormatException e) {
-            return -1; // Retorna um valor inválido em caso de erro
+            return -1; 
         }
     }
 
     public boolean isRespostaCorreta(int respostaUsuario) {
         return respostaUsuario == getRespostaCorretaIndice();
     }
+
 }
