@@ -1,7 +1,6 @@
 package projetogcm;
 
 public class Jogador {
-//Representa o jogador atual, contendo seu estado (pontuação e total respondidas).
 	private String nome;
     private int pontuacao;
     private int totalRespondidas;
@@ -12,7 +11,7 @@ public class Jogador {
         this.totalRespondidas = 0;
     }
 
-    // Método para atualizar o estado do jogador (chamado por Quiz)
+    // MÃ©todo para atualizar o estado do jogador (chamado por Quiz)
     public void registrarResposta(boolean acertou) {
         if (acertou) {
             this.pontuacao++;
@@ -20,7 +19,7 @@ public class Jogador {
         this.totalRespondidas++;
     }
 
-    // Getters para Relatório Final (RF6)
+    // Getters para RelatÃ³rio Final (RF6)
     public String getNome() {
         return nome;
     }
@@ -33,10 +32,10 @@ public class Jogador {
         return totalRespondidas;
     }
 
-    // RF6: Cálculo da Taxa de Acerto (agora no Jogador, com seus dados)
+    // RF6: CÃ¡lculo da Taxa de Acerto
     public double calcularTaxaAcerto() {
         if (totalRespondidas == 0) return 0.0;
         return ((double) pontuacao / totalRespondidas) * 100;
     }	
-	    
+		
 }
