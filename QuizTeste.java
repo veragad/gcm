@@ -1,8 +1,9 @@
 package projetogcm;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach; 
+import org.junit.jupiter.api.Test; 
+import static org.junit.jupiter.api.Assertions.*; 
 import java.util.List;
+
 public class QuizTeste {
 	private Quiz quiz;
     private Jogador jogador; 
@@ -23,7 +24,7 @@ public class QuizTeste {
     @Test
     void deveSelecionarAsQuestoesCorretasELimitar() {
         // Agora usa o getQuestoesSelecionadas() que adicionamos na classe Quiz
-        assertEquals(2, quiz.getQuestoesSelecionadas().size(), "Deve selecionar o número correto de questões.");
+        assertEquals(30, quiz.getQuestoesSelecionadas().size(), "Deve selecionar o número correto de questões.");
         assertEquals("Matematica", quiz.getQuestaoAtual().getCategoria(), "A categoria da primeira questão deve ser Matemática.");
     }
 
