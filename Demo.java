@@ -1,14 +1,12 @@
 package projetogcm;
-import projetogcm.Questao;
-import projetogcm.Quiz;
-import projetogcm.Jogador; 
-import javax.swing.*;
+import javax.swing.*; 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.ArrayList; 
+import java.util.Arrays; 
 import java.util.List;
+import java.util.stream.Collectors; 
 
 public class Demo implements ActionListener{
 	private JFrame frame;
@@ -19,9 +17,12 @@ public class Demo implements ActionListener{
 
     private Quiz quiz;
     private Jogador jogador;
+    
+    private static final Object[] CATEGORIAS = {"Matemática", "Português", "Cidadania"};
+
+    private final Color COR_PADRAO_BOTAO = UIManager.getColor("Button.background"); 
 
     public Demo() {
-        // 1. Coleta o nome do jogador
         String nomeJogador = JOptionPane.showInputDialog(null, "Digite seu nome para iniciar o Quiz:", "Bem-vindo", JOptionPane.QUESTION_MESSAGE);
         
         if (nomeJogador == null || nomeJogador.trim().isEmpty()) {
@@ -29,35 +30,35 @@ public class Demo implements ActionListener{
         }
         
         this.jogador = new Jogador(nomeJogador);
-        List<Questao> dadosIniciais = criarDadosIniciais();
-        this.quiz = new Quiz(dadosIniciais, this.jogador);
+        
+        // CORREÇÃO: Chama o GerenciadorDeQuestoes para obter as 90 questões
+        List<Questao> questoesDisponiveis = GerenciadorDeQuestoes.carregarQuestoesDeArquivo("ignorado.json");
 
-        // 2. Pede para o jogador selecionar a categoria
-        Object[] categorias = {"Matematica", "Português", "Cidadania"};
         String categoriaSelecionada = (String) JOptionPane.showInputDialog(
             null,
-            "Selecione a categoria para começar o Quiz:",
+            "Selecione a categoria:",
             "Seleção de Categoria",
             JOptionPane.QUESTION_MESSAGE,
             null,
-            categorias,
-            categorias[0]
+            CATEGORIAS,
+            CATEGORIAS[0]
         );
-        
-        // Trata o cancelamento da seleção, definindo um padrão
-        if (categoriaSelecionada == null || categoriaSelecionada.trim().isEmpty()) {
-             categoriaSelecionada = "Matematica"; 
-        }
 
+        if (categoriaSelecionada == null || categoriaSelecionada.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Nenhuma categoria selecionada. Encerrando.", "Fim", JOptionPane.INFORMATION_MESSAGE);
+            System.exit(0);
+        }
+        
+        this.quiz = new Quiz(questoesDisponiveis, this.jogador);
         this.quiz.selecionarCategoria(categoriaSelecionada);
 
-        // O restante do construtor monta a GUI
-        frame = new JFrame("O Desafio do Saber (ODS 4)");
+
+        frame = new JFrame("O Desafio do Saber (" + categoriaSelecionada + ")");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 450); 
         frame.setLayout(new BorderLayout(10, 10));
 
-        lblPergunta = new JLabel("Bem-vindo(a), " + this.jogador.getNome() + ". Clique em Iniciar.", SwingConstants.CENTER);
+        lblPergunta = new JLabel("Categoria: " + categoriaSelecionada + ". Clique em Iniciar.", SwingConstants.CENTER);
         lblPergunta.setFont(new Font("SansSerif", Font.BOLD, 16));
         lblPergunta.setPreferredSize(new Dimension(600, 80)); 
         frame.add(lblPergunta, BorderLayout.NORTH);
@@ -70,6 +71,7 @@ public class Demo implements ActionListener{
             botoesOpcoes[i].addActionListener(this);
             botoesOpcoes[i].setActionCommand(String.valueOf(i + 1));
             botoesOpcoes[i].setEnabled(false);
+            botoesOpcoes[i].setFont(new Font("SansSerif", Font.PLAIN, 12));
             painelOpcoes.add(botoesOpcoes[i]);
         }
         frame.add(painelOpcoes, BorderLayout.CENTER);
@@ -93,9 +95,7 @@ public class Demo implements ActionListener{
         
         if ("INICIAR".equals(comando)) {
             ((JButton)e.getSource()).setVisible(false);
-            
-            proximaQuestao();
-            
+            proximaQuestao(); 
             frame.revalidate(); 
             frame.repaint();
             
@@ -104,16 +104,22 @@ public class Demo implements ActionListener{
             processarResposta(respostaUsuario);
         }
     }
-
+    
     private void proximaQuestao() {
         if (quiz.isFimDoQuiz()) {
             exibirRelatorioFinal();
             return;
         }
         
+        for (JButton b : botoesOpcoes) {
+            b.setBackground(COR_PADRAO_BOTAO);
+            b.setForeground(Color.BLACK); 
+            b.setEnabled(true);
+            b.setVisible(true); 
+        }
+        
         Questao q = quiz.getQuestaoAtual();
         
-        // Proteção contra NullPointerException (para o caso de não haver questões na categoria)
         if (q == null) {
             lblPergunta.setText("<html><center><font color='red'>ERRO: Nenhuma questão disponível para exibir.</font></center></html>");
             for(JButton b : botoesOpcoes) b.setEnabled(false);
@@ -123,9 +129,19 @@ public class Demo implements ActionListener{
         lblPergunta.setText("<html><center><b>" + q.getCategoria() + "</b></center><br>" + q.getTexto() + "</html>"); 
 
         List<String> opcoes = q.getOpcoes();
-        for (int i = 0; i < opcoes.size(); i++) {
-            botoesOpcoes[i].setText(opcoes.get(i));
-            botoesOpcoes[i].setEnabled(true);
+        
+        for (int i = 0; i < 4; i++) { 
+            if (i < opcoes.size()) {
+                String textoOpcao = opcoes.get(i);
+                
+                botoesOpcoes[i].setText("<html><b>" + (i + 1) + ". </b> &nbsp; " + textoOpcao + "</html>");
+                
+                botoesOpcoes[i].setEnabled(true);
+            } else {
+                 botoesOpcoes[i].setText(""); 
+                 botoesOpcoes[i].setEnabled(false);
+                 botoesOpcoes[i].setVisible(false);
+            }
         }
         lblFeedback.setText("Selecione sua resposta.");
     }
@@ -133,46 +149,59 @@ public class Demo implements ActionListener{
     private void processarResposta(int respostaUsuario) {
         if (quiz.isFimDoQuiz()) return;
 
-        boolean acertou = quiz.verificarResposta(respostaUsuario);
-
-        if (acertou) {
-            lblFeedback.setText("<html><font color='green'>CORRETO!</font> (Pontuação: " + jogador.getPontuacao() + ")</html>");
-        } else {
-            lblFeedback.setText("<html><font color='red'>INCORRETO!</font></html>");
-        }
+        Questao questaoAtual = quiz.getQuestaoAtual();
+        if (questaoAtual == null) return;
+        
+        boolean acertou = quiz.verificarResposta(respostaUsuario); 
+        int respostaCorretaIndice = questaoAtual.getRespostaCorretaIndice();
         
         for(JButton b : botoesOpcoes) b.setEnabled(false);
+
+        if (respostaCorretaIndice > 0 && respostaCorretaIndice <= 4) {
+             botoesOpcoes[respostaCorretaIndice - 1].setBackground(Color.GREEN);
+        }
+        
+        if (acertou) {
+            lblFeedback.setText("<html><font color='green'>CORRETO!</font> (Pontuação: " + jogador.getPontuacao() + ")</html>");
+            
+        } else {
+            botoesOpcoes[respostaUsuario - 1].setBackground(Color.RED);
+            lblFeedback.setText("<html><font color='red'>INCORRETO!</font> (Resposta correta: " + respostaCorretaIndice + ")</html>");
+        }
 
         Timer timer = new Timer(1500, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                proximaQuestao();
+                SwingUtilities.invokeLater(() -> proximaQuestao()); 
                 ((Timer)e.getSource()).stop();
             }
         });
         timer.setRepeats(false);
         timer.start();
     }
-
+    
     private void exibirRelatorioFinal() {
         painelOpcoes.setVisible(false);
         lblFeedback.setVisible(false);
         
-        String relatorio = String.format(
-            "<html><center><h2>FIM DO QUIZ!</h2>" +
+        String categoria = quiz.getCategoriaAtual();
+        
+        String relatorioFinal = String.format(
+            "<html><center><h2>FIM DO QUIZ DE %s!</h2>" +
             "<b>Jogador:</b> %s<br>" +
-            "<b>Pontuação Total:</b> %d de %d<br>" +
-            "<b>Taxa de Acerto:</b> <font color='blue'>%.2f%%</font></center></html>",
+            "<b>Pontuação Final:</b> %d acerto(s) em %d questões.<br>" +
+            "<b>Taxa de Acerto:</b> <font color='blue'>%.2f%%</font><br><br>" +
+            "Para jogar outra categoria, feche e abra o programa novamente." +
+            "</center></html>",
+            categoria.toUpperCase(),
             jogador.getNome(), 
             jogador.getPontuacao(), 
             jogador.getTotalRespondidas(), 
             jogador.calcularTaxaAcerto()
         );
 
-        // Garante que o relatório final não seja cortado
         lblPergunta.setPreferredSize(null); 
-        
-        lblPergunta.setText(relatorio);
+        lblPergunta.setText(relatorioFinal);
         frame.revalidate();
         frame.repaint();
     }
@@ -183,36 +212,5 @@ public class Demo implements ActionListener{
                 new Demo();
             }
         });
-    }
-
-    // Método com a lista de questões (2 por categoria)
-    public static List<Questao> criarDadosIniciais() {
-        List<Questao> questoes = new ArrayList<>();
-        
-        // Categoria: Matematica (2 questões)
-        questoes.add(new Questao("Quanto é 5 x 7?", 
-            Arrays.asList("30", "35", "40", "45"), 
-            "2", "Matematica")); 
-        questoes.add(new Questao("Quanto é 2 + 2?", 
-            Arrays.asList("3", "4", "5", "6"), 
-            "2", "Matematica"));
-        
-        // Categoria: Português (2 questões)
-        questoes.add(new Questao("Qual palavra está escrita corretamente?", 
-            Arrays.asList("Exseto", "Ecsceção", "Eçeção", "Exceção"), 
-            "4", "Português"));
-        questoes.add(new Questao("Qual é o plural de 'cidadão'?", 
-            Arrays.asList("Cidadões", "Cidadãos", "Cidadãoes", "Cidades"), 
-            "2", "Português"));
-            
-        // Categoria: Cidadania (2 questões)
-        questoes.add(new Questao("Qual ODS trata da Educação de Qualidade?", 
-            Arrays.asList("ODS 1", "ODS 4", "ODS 10", "ODS 16"), 
-            "2", "Cidadania"));
-        questoes.add(new Questao("O que significa a sigla ODS?", 
-            Arrays.asList("Organizações de Desenvolvimento Social", "Objetivos de Desenvolvimento Sustentável", "Ordem Democrática Social", "Operações de Defesa e Segurança"), 
-            "2", "Cidadania"));
-        
-        return questoes;
-    }
+    }		
 }
