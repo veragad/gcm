@@ -1,23 +1,37 @@
-name: java-ci
+# Caminho: .github/workflows/java_ci.yml
 
-on: push
+name: CI de Testes do Projeto Quiz (Gradle)
+
+# Gatilho: Roda quando há um envio de código (push)
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
+  build_and_test:
+    runs-on: ubuntu-latest # Usa o sistema operacional Linux
+    
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    - name: Set up JDK
-      uses: actions/setup-java@v3
+    
+    # 1. Baixa o seu código
+    - name: Checkout do Repositório
+      uses: actions/checkout@v4
+      
+    # 2. Configura o Java (deve corresponder ao que você definiu no build.gradle)
+    - name: Configurar Java 17
+      uses: actions/setup-java@v4
       with:
+        java-version: '17' 
         distribution: 'temurin'
-        java-version: '17'
-
-    - name: Compile Java project (with libs)
-      run: |
-        mkdir -p out
-        LIBS=$(printf "lib/*.jar" | tr '\n' ':')
-        javac -cp "$LIBS" -d out $(find src -name "*.java")
+        cache: 'gradle' 
+        
+    # 3. Configura Permissões para o Wrapper (Se você usar o gradlew)
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+      
+    # 4. A etapa principal: Compila, baixa dependências e RODA O QUIZTESTE
+    - name: Executar Build do Gradle e Rodar Testes
+      # Este comando executa os testes unitários. Se QuizTeste falhar, a CI falha.
+      run: ./gradlew build
