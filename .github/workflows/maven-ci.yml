@@ -13,20 +13,19 @@ jobs:
     
     steps:
     
-    # 1. Baixa o meu código
+    # Baixa o meu código
     - name: Checkout do Repositório
       uses: actions/checkout@v4
       
-    # Configura o Java 8 (1.8) que uso
-    - name: Configurar Java 8
+    # Tenno que usar o Java 17 para EXECUTAR O GRADLE
+    - name: Configurar Java 17 (Obrigatorio para o Gradle)
       uses: actions/setup-java@v4
       with:
-        java-version: '8' 
+        java-version: '17' 
         distribution: 'temurin'
         cache: 'gradle' 
         
-        
-    # 4. Executa a compilação e os testes
+    # Executa a compilação e os testes
+    # O build.gradle garante fará ser compilado para Java 8
     - name: Executar Build do Gradle e Rodar Testes
-      # CORREÇÃO: Usamos 'gradle build' (o comando do sistema) em vez de './gradlew'
       run: gradle build
