@@ -1,43 +1,23 @@
-name: Java CI (Maven)
+name: java-ci
 
-on:
-  push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
-  workflow_dispatch:     # permite disparar manualmente no GitHub
+on: push
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout do código
-        uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v3
 
-      - name: Setup JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: '17'
-          cache: 'maven'    # instrui setup-java a registrar cache para Maven
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
 
-      - name: Cache do repositório Maven (extra)
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-m2-
-
-      - name: Instalar dependências e rodar testes
-        run: mvn -B -V -e clean test
-
-      - name: Build (package)
-        run: mvn -B package
-
-      - name: Salvar artefato (jar)
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-jar
-          path: target/*.jar
+    - name: Compile Java project (with libs)
+      run: |
+        mkdir -p out
+        LIBS=$(printf "lib/*.jar" | tr '\n' ':')
+        javac -cp "$LIBS" -d out $(find src -name "*.java")
