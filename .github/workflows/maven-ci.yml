@@ -1,4 +1,4 @@
-# Gradle
+# Gradle (Integração Contínua vejo aqui)
 name: CI de Testes do Projeto Quiz (Gradle)
 
 on:
