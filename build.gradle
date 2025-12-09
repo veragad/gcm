@@ -6,10 +6,10 @@ plugins {
 group = 'com.projetogcm'
 version = '1.0-SNAPSHOT'
 
-// Definindo a versão do Java para compilação
+// usando a versão 1.8 (Java 8)
 java {
-    sourceCompatibility = JavaVersion.VERSION_17 
-    targetCompatibility = JavaVersion.VERSION_17 
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 repositories {
@@ -21,7 +21,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.1'
 
-    // Dependência do Gson 
+    // Dependência do Gson
     implementation 'com.google.code.gson:gson:2.11.0'
 }
 
