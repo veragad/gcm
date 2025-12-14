@@ -15,4 +15,9 @@ public final class PatchSeguranca {
     public static String obterVersao() {
         return VERSAO_PATCH;
     }
+
+    public static boolean isPatchObsoleto(String versaoAlvo) {
+        // Usa a comparação lexicográfica para verificar se a versão atual é "menor" (mais antiga)
+        return VERSAO_PATCH.compareTo(versaoAlvo) < 0;
+    }
 }
