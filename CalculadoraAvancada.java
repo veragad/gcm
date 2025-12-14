@@ -10,8 +10,12 @@ public final class CalculadoraAvancada {
     public static double calcularFator(int entrada) {
         return entrada * FATOR_CORRECAO;
     }
-
+    public static double calcularFatorComDiferenca(int valorA, int valorB) {
+        int diferenca = valorA - valorB;
+        return diferenca * FATOR_CORRECAO;
+    }
     public static String obterDescricao() {
         return "Módulo de cálculos avançados, versão alfa.";
     }
 }
+    
