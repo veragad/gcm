@@ -103,6 +103,15 @@ O projeto segue a estrutura padrão recomendada pelo Gradle para aplicações Ja
 
 ---
 
+## Gerência de Configuração e Mudanças
+
+O projeto utiliza o GitHub como sistema de controle de versão, permitindo o registro e o acompanhamento das alterações realizadas ao longo do desenvolvimento.  
+
+A automação do processo de build e testes é realizada por meio do GitHub Actions, garantindo que cada modificação submetida ao repositório seja automaticamente verificada.  
+
+Essa abordagem contribui para a rastreabilidade das mudanças, reprodutibilidade do build e maior confiabilidade do software.
+
+
 ## Contribuições
 
 Contribuições podem ser realizadas por meio de *fork* do repositório, criação de uma nova *branch*, implementação das melhorias desejadas e envio de um *pull request*.
