@@ -122,8 +122,8 @@ Contribuições podem ser realizadas por meio de *fork* do repositório, criaç�
 
 Para dúvidas, sugestões ou contribuições, entre em contato:
 
-Vera Gadelha
-E-mail: [vera.gadelha@alunos.ufersa.edu.br](mailto:vera.gadelha@alunos.ufersa.edu.br)
+Vera 
+E-mail:
 
 ---
 
